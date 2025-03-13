@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }} - DSM Times{% endblock %}
+{% block content %}
+    <article class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
+        <img src="{{ article.featured_image.url }}" class="w-full h-64 md:h-96 object-cover rounded-lg mb-6" alt="{{ article.title }}">
+        <span class="text-sm text-gray-500 dark:text-gray-400">{{ article.category.name }}</span>
+        <h1 class="text-4xl font-bold mb-4">{{ article.title }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">By {{ article.author.username }} | {{ article.published_at|date:"F d, Y" }} | {{ article.views_count }} views | {{ article.read_time_minutes }} min read</p>
+        <div class="prose dark:prose-invert">{{ article.content|safe }}</div>
+        <div class="mt-6 flex space-x-4">
+            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ article.title|urlencode }}" target="_blank" class="text-blue-400 hover:text-blue-500"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}" target="_blank" class="text-blue-600 hover:text-blue-700"><i class="fab fa-facebook"></i></a>
+        </div>
+    </article>
+    <section class="mt-12">
+        <h2 class="text-3xl font-bold mb-6">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for related in related_articles %}
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                    <img src="{{ related.featured_image.url }}" class="w-full h-48 object-cover" alt="{{ related.title }}">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold">{{ related.title }}</h3>
+                        <a href="{% url 'article_detail' related.slug %}" class="mt-2 inline-block text-blue-600 hover:underline">Read More</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="mt-12">
+        <h2 class="text-3xl font-bold mb-6">Comments</h2>
+        {% for comment in comments %}
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-4">
+                <p class="text-gray-700 dark:text-gray-300">{{ comment.content }}</p>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">By {{ comment.user.username }} on {{ comment.created_at|date:"F d, Y" }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-600 dark:text-gray-400">No comments yet. Be the first!</p>
+        {% endfor %}
+        {% if user.is_authenticated %}
+            <form method="post" class="mt-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                {% csrf_token %}
+                <textarea name="content" class="w-full p-3 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" rows="4" placeholder="Add your comment..." required></textarea>
+                <button type="submit" class="mt-4 bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700 transition duration-200">Submit</button>
+            </form>
+        {% else %}
+            <p class="mt-6 text-gray-600 dark:text-gray-400"><a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login</a> to leave a comment.</p>
+        {% endif %}
+    </section>
+{% endblock %}
