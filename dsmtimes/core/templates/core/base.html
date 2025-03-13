@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" {% if dark_mode %}class="dark"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DSM Times - The ultimate source for technology, science, and culture news.">
+    <meta name="keywords" content="technology, science, culture, news, DSM Times">
+    <title>{% block title %}DSM Times{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300">
+    <header class="bg-gray-900 text-white py-4 shadow-lg sticky top-0 z-10">
+        <nav class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold tracking-tight">DSM Times</a>
+            <div class="space-x-6 flex items-center">
+                <a href="{% url 'home' %}" class="hover:text-blue-400 transition duration-200">Home</a>
+                {% for category in categories %}
+                    <a href="#" class="hover:text-blue-400 transition duration-200">{{ category.name }}</a>
+                {% endfor %}
+                <a href="{% url 'search' %}" class="hover:text-blue-400 transition duration-200"><i class="fas fa-search"></i></a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'submit_article' %}" class="hover:text-blue-400 transition duration-200">Submit</a>
+                    <a href="{% url 'profile' %}" class="hover:text-blue-400 transition duration-200">Profile</a>
+                    <a href="{% url 'logout' %}" class="hover:text-blue-400 transition duration-200">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="hover:text-blue-400 transition duration-200">Login</a>
+                {% endif %}
+                <a href="{% url 'toggle_dark_mode' %}" class="hover:text-blue-400 transition duration-200">
+                    {% if dark_mode %}
+                        <i class="fas fa-sun"></i>
+                    {% else %}
+                        <i class="fas fa-moon"></i>
+                    {% endif %}
+                </a>
+            </div>
+        </nav>
+    </header>
+    <main class="container mx-auto my-8">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="bg-{{ message.tags }}-100 dark:bg-{{ message.tags }}-800 border-l-4 border-{{ message.tags }}-500 text-{{ message.tags }}-700 dark:text-{{ message.tags }}-200 p-4 mb-4" role="alert">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">DSM Times</h3>
+                <p>The ultimate destination for cutting-edge news and insights.</p>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="{% url 'home' %}" class="hover:text-blue-400">Home</a></li>
+                    <li><a href="{% url 'subscribe' %}" class="hover:text-blue-400">Subscribe</a></li>
+                    <li><a href="{% url 'profile' %}" class="hover:text-blue-400">Profile</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">Newsletter</h3>
+                <form action="{% url 'newsletter_signup' %}" method="post">
+                    {% csrf_token %}
+                    <input type="email" name="email" placeholder="Your email" class="p-2 rounded-l-md border-none focus:outline-none w-2/3 bg-gray-800 text-white" required>
+                    <button type="submit" class="bg-blue-600 text-white p-2 rounded-r-md hover:bg-blue-700">Subscribe</button>
+                </form>
+                <div class="mt-4 flex space-x-4 justify-center">
+                    <a href="#" class="text-white hover:text-blue-400"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white hover:text-blue-400"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-white hover:text-blue-400"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <p class="text-center mt-6">© 2025 DSM Times. All rights reserved.</p>
+    </footer>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
